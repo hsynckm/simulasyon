@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TM2 Valmet DNA — Operatör Devreye Alma Simülatörü</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Üst DCS Durum & Navigasyon Çubuğu -->
+  <header class="dcs-topbar">
+    <div class="dcs-brand">
+      <span class="dna-badge">DNAuse A101</span>
+      <div>
+        <h1>TM2 Devreye Alma (Start-Up) Simülatörü</h1>
+        <p id="active-screen-subtitle">10.3 — Fresh Water (Sealing & Cooling Water)</p>
+      </div>
+    </div>
+
+    <div class="dcs-telemetry">
+      <div class="tele-box">
+        <span class="tele-label">Yankee Hızı</span>
+        <span class="tele-val" id="tele-yankee-speed">120 m/min</span>
+      </div>
+      <div class="tele-box">
+        <span class="tele-label">Keçe / Elek Hızı</span>
+        <span class="tele-val" id="tele-wire-speed">0 m/min</span>
+      </div>
+      <div class="tele-box">
+        <span class="tele-label">Headbox Basınç</span>
+        <span class="tele-val" id="tele-hbx-press">0 kPa</span>
+      </div>
+      <div class="tele-box">
+        <span class="tele-label">Jet / Wire</span>
+        <span class="tele-val" id="tele-jw-ratio">0.000</span>
+      </div>
+      <div class="tele-box">
+        <span class="tele-label">Toplam Hamur Akışı</span>
+        <span class="tele-val" id="tele-stock-flow">0 l/min</span>
+      </div>
+      <div class="tele-box">
+        <span class="tele-label">Üretim Durumu</span>
+        <span class="tele-val status-stopped" id="tele-prod-status">DURUŞ / HAZIRLIK</span>
+      </div>
+    </div>
+
+    <div class="dcs-actions">
+      <button class="btn-interlock" id="btn-check-interlock" title="Aktif adımın kilit şartlarını incele">
+        Neden Çalışmıyor? (İnterlock)
+      </button>
+      <button class="btn-editor" id="btn-toggle-editor" title="İkon koordinatlarını görsel üzerinde sürükleyerek ayarla">
+        Koordinat Düzenle (Alt+E)
+      </button>
+      <button class="btn-reset" id="btn-reset-sim">Sıfırla</button>
+    </div>
+  </header>
+
+  <!-- Sabit Ön Şartlar (Altta Çalışan Sistemler) -->
+  <section class="prereq-bar">
+    <span class="prereq-title">Saha Ön Şartları:</span>
+    <span class="pill pill-green">Hood & Buhar: HAZIR</span>
+    <span class="pill pill-green">Yankee 1 & 2: RUN</span>
+    <span class="pill pill-green">Merkezi Yağlama & Hidrolik: ÇALIŞIYOR</span>
+    <span class="pill pill-green">Cooling Water: ÇALIŞIYOR</span>
+    <span class="pill pill-green">LP Sealing Water (4.0 Bar): ÇALIŞIYOR</span>
+    <span class="pill pill-warn" id="pill-hp-water">HP Sealing Water: KAPALI</span>
+    <span class="pill pill-warn" id="pill-utm-status">UTM (Hamur/Sıvama): DURUYOR</span>
+  </section>
+
+  <!-- Valmet DNA Ekran Sekmeleri -->
+  <nav class="screen-tabs" id="screen-tabs"></nav>
+
+  <!-- Ana Çalışma Alanı -->
+  <main class="workspace">
+    <!-- Sol: Aktif Görev & Adım Rehberi -->
+    <aside class="mission-panel">
+      <div class="mission-header">
+        <span class="step-badge" id="step-counter">ADIM 1 / 15</span>
+        <label class="toggle-hint">
+          <input type="checkbox" id="chk-coach-mode" checked />
+          Eğitmen Rehberi Açık
+        </label>
+      </div>
+
+      <h2 id="mission-title">Yükleniyor...</h2>
+      <p class="mission-desc" id="mission-desc"></p>
+
+      <div class="mission-target-box" id="mission-hint-box">
+        <strong>Hedef Ekran & İşlem:</strong>
+        <p id="mission-target-text"></p>
+      </div>
+
+      <div class="interlock-alert hidden" id="interlock-alert">
+        <div class="alert-head">
+          <span>⛔ İNTERLOCK (KİLİT) ENGELİ</span>
+          <button id="btn-close-alert">×</button>
+        </div>
+        <p id="interlock-alert-msg"></p>
+      </div>
+
+      <div class="step-list-container">
+        <h3>Devreye Alma Sekansı</h3>
+        <ol class="step-list" id="step-list"></ol>
+      </div>
+
+      <div class="event-log-container">
+        <h3>DCS Olay Kaydı</h3>
+        <ul class="event-log" id="event-log"></ul>
+      </div>
+    </aside>
+
+    <!-- Orta: Gerçek DCS Ekran Görüntüsü + Etkileşimli İkonlar -->
+    <section class="canvas-wrapper">
+      <div class="editor-banner hidden" id="editor-banner">
+        <span>🛠️ <strong>Koordinat Düzenleme Modu Aktif:</strong> İkonları sürükleyip gerçek görseldeki yerlerine oturtun.</span>
+        <button id="btn-export-coords">Koordinatları Kopyala (JSON)</button>
+      </div>
+
+      <div class="dcs-viewport" id="dcs-viewport">
+        <img id="dcs-bg-image" src="" alt="DCS Ekran Görüntüsü" />
+        <div class="dcs-fallback-grid" id="dcs-fallback-grid"></div>
+        <div class="hotspot-layer" id="hotspot-layer"></div>
+      </div>
+
+      <!-- Valmet DNA Renk Lejantı -->
+      <footer class="dna-legend">
+        <div class="legend-item"><span class="icon-sample state-auto-stop">M</span> Otomatikte & Duruyor</div>
+        <div class="legend-item"><span class="icon-sample state-man-stop">M</span> Manuelde & Duruyor</div>
+        <div class="legend-item"><span class="icon-sample state-man-run">M</span> Manuelde & Çalışıyor</div>
+        <div class="legend-item"><span class="icon-sample state-auto-run">M</span> Otomatikte & Çalışıyor (>>)</div>
+        <div class="legend-item"><span class="icon-sample state-fault">X</span> Arıza / Fault</div>
+      </footer>
+    </section>
+  </main>
+
+  <!-- Valmet DNA Motor / Kontrol Faceplate Penceresi -->
+  <div class="faceplate-modal hidden" id="faceplate-modal">
+    <div class="fp-header">
+      <span id="fp-title">Motor Kontrol</span>
+      <button id="fp-close">×</button>
+    </div>
+    <div class="fp-body">
+      <div class="fp-status-row">
+        <span>Durum:</span>
+        <strong id="fp-state-text">Duruyor</strong>
+      </div>
+      <div class="fp-status-row">
+        <span>Mod:</span>
+        <strong id="fp-mode-text">Auto</strong>
+      </div>
+      <div class="fp-dynamic-controls" id="fp-dynamic-controls"></div>
+      <div class="fp-buttons" id="fp-buttons"></div>
+    </div>
+  </div>
+
+  <!-- İnterlock Teşhis Modalı -->
+  <div class="faceplate-modal hidden" id="interlock-modal">
+    <div class="fp-header fp-header-warn">
+      <span>İnterlock & Kilit Matrisi</span>
+      <button id="il-close">×</button>
+    </div>
+    <div class="fp-body">
+      <p class="il-intro">Mevcut adımda sistemin izin vermesi için aşağıdaki şartların sağlanması gerekir:</p>
+      <ul class="il-checklist" id="il-checklist"></ul>
+    </div>
+  </div>
+
+  <script src="scenarios.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
