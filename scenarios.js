@@ -1,16 +1,16 @@
 // TM2 Valmet DNA Operatör Devreye Alma Senaryo, Boru Akışı & Ekran Yapılandırması
 
 const SCREENS = [
-  { id: "fresh_water", code: "10.3", name: "Fresh Water", image: "images/fresh water.jpg" },
-  { id: "shower_water", code: "70.3", name: "Shower Water", image: "images/shower water.jpg" },
-  { id: "wire_press", code: "70.9.4", name: "Wire/Press Sec.", image: "images/wire_pres section.jpg" },
-  { id: "turbo_vacuum", code: "10.5.1", name: "Turbo Vacuum", image: "images/turbo blower.jpg" },
+  { id: "fresh_water", code: "10.3", name: "Fresh Water", image: "images/fresh%20water.jpg" },
+  { id: "shower_water", code: "70.3", name: "Shower Water", image: "images/shower%20water.jpg" },
+  { id: "wire_press", code: "70.9.4", name: "Wire/Press Sec.", image: "images/wire_pres%20section.jpg" },
+  { id: "turbo_vacuum", code: "10.5.1", name: "Turbo Vacuum", image: "images/turbo%20blower.jpg" },
   { id: "coating", code: "10.9", name: "Coating", image: "images/coating.jpg" },
-  { id: "press_stretchers", code: "70.2", name: "Press & Stretch.", image: "images/press and strechers.jpg" },
+  { id: "press_stretchers", code: "70.2", name: "Press & Stretch.", image: "images/press%20and%20strechers.jpg" },
   { id: "approach_screens", code: "11.5", name: "Approach Screens", image: "images/screenler.jpg" },
   { id: "headbox", code: "70.1", name: "Headbox", image: "images/headbox.jpg" },
-  { id: "we_hood", code: "62.1", name: "WE AirCap / Hood", image: "images/we hood.jpg" },
-  { id: "reel_section", code: "70.9.3", name: "Reel Section", image: "images/reel section.jpg" },
+  { id: "we_hood", code: "62.1", name: "WE AirCap / Hood", image: "images/we%20hood.jpg" },
+  { id: "reel_section", code: "70.9.3", name: "Reel Section", image: "images/reel%20section.jpg" },
   { id: "qcs_overview", code: "90", name: "QCS Overview", image: "images/qsc.jpg" }
 ];
 
