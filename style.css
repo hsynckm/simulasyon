@@ -1,0 +1,676 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: #14191f;
+  color: #e6edf3;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Topbar */
+.dcs-topbar {
+  background: #1c232b;
+  border-bottom: 2px solid #2f3a46;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dcs-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dna-badge {
+  background: #0078d4;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.dcs-brand h1 {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.dcs-brand p {
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.dcs-telemetry {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tele-box {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  padding: 4px 10px;
+  border-radius: 4px;
+  min-width: 100px;
+}
+
+.tele-label {
+  display: block;
+  font-size: 10px;
+  color: #8b949e;
+  text-transform: uppercase;
+}
+
+.tele-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: #58a6ff;
+}
+
+.status-stopped { color: #f0883e; }
+.status-running { color: #3fb950; }
+
+.dcs-actions {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  transition: 0.15s;
+}
+
+.btn-interlock { background: #d29922; color: #0d1117; }
+.btn-interlock:hover { background: #e3b341; }
+.btn-editor { background: #30363d; color: #c9d1d9; }
+.btn-editor:hover { background: #484f58; }
+.btn-reset { background: #da3633; color: #fff; }
+.btn-reset:hover { background: #f85149; }
+
+/* Ön Şartlar Çubuğu */
+.prereq-bar {
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  padding: 5px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11px;
+}
+
+.prereq-title {
+  font-weight: 700;
+  color: #8b949e;
+}
+
+.pill {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.pill-green {
+  background: rgba(46, 160, 67, 0.2);
+  border: 1px solid #2ea043;
+  color: #3fb950;
+}
+
+.pill-warn {
+  background: rgba(210, 153, 34, 0.18);
+  border: 1px solid #d29922;
+  color: #e3b341;
+}
+
+/* Sekmeler */
+.screen-tabs {
+  background: #21262d;
+  border-bottom: 1px solid #30363d;
+  padding: 4px 12px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: #2d333b;
+  color: #adbac7;
+  padding: 6px 11px;
+  font-size: 12px;
+  border-radius: 4px 4px 0 0;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.tab-btn:hover { background: #373e47; }
+.tab-btn.active {
+  background: #0078d4;
+  color: #fff;
+  border-color: #58a6ff;
+}
+.tab-btn.target-screen {
+  box-shadow: inset 0 -2px 0 #3fb950;
+}
+
+/* Ana Alan */
+.workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.mission-panel {
+  width: 345px;
+  background: #161b22;
+  border-right: 1px solid #30363d;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.mission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.step-badge {
+  background: #238636;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.toggle-hint {
+  font-size: 11px;
+  color: #8b949e;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.mission-panel h2 {
+  font-size: 14.5px;
+  color: #f0f6fc;
+}
+
+.mission-desc {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #c9d1d9;
+}
+
+.mission-target-box {
+  background: rgba(56, 139, 253, 0.12);
+  border-left: 3px solid #58a6ff;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.mission-target-box p {
+  margin-top: 4px;
+  color: #a5d6ff;
+}
+
+.interlock-alert {
+  background: rgba(218, 54, 51, 0.22);
+  border: 1px solid #f85149;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.alert-head {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  color: #ff7b72;
+  margin-bottom: 4px;
+}
+
+.alert-head button {
+  background: transparent;
+  color: #ff7b72;
+  padding: 0 4px;
+  font-size: 16px;
+}
+
+.step-list-container h3, .event-log-container h3 {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  color: #8b949e;
+  margin-bottom: 6px;
+}
+
+.step-list {
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  background: #0d1117;
+}
+
+.step-list li {
+  padding: 6px 8px;
+  font-size: 11.5px;
+  border-bottom: 1px solid #21262d;
+  color: #8b949e;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.step-list li:hover {
+  background: #1f242c;
+  color: #e6edf3;
+}
+
+.step-list li.done {
+  color: #3fb950;
+  text-decoration: line-through;
+}
+
+.step-list li.current {
+  background: rgba(56, 139, 253, 0.18);
+  color: #f0f6fc;
+  font-weight: 600;
+}
+
+.event-log {
+  list-style: none;
+  max-height: 125px;
+  overflow-y: auto;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  padding: 6px;
+  font-size: 11px;
+}
+
+.event-log li {
+  margin-bottom: 4px;
+  color: #adbac7;
+}
+
+.event-log li.log-err { color: #ff7b72; }
+.event-log li.log-ok { color: #3fb950; }
+
+/* Sağ Görsel Alanı */
+.canvas-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0d1117;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.editor-banner {
+  background: #9e6a03;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.dcs-viewport {
+  position: relative;
+  flex: 1;
+  background: #c6c8ca;
+  border: 2px solid #30363d;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#dcs-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+
+.dcs-fallback-grid {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #d0d3d6;
+  color: #222;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Resim Üzeri Canlı Boru Hattı Akış Katmanı */
+.pipe-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.pipe-base {
+  fill: none;
+  stroke: rgba(40, 48, 56, 0.35);
+  stroke-width: 0.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pipe-flow {
+  fill: none;
+  stroke-width: 0.85;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1.8 1.4;
+  animation: flowDash 0.85s linear infinite;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+}
+
+.pipe-flow.water { stroke: #00e676; }
+.pipe-flow.hp-water { stroke: #00b0ff; }
+.pipe-flow.vacuum { stroke: #38bdf8; }
+.pipe-flow.chemical { stroke: #c084fc; }
+.pipe-flow.pulp { stroke: #facc15; }
+.pipe-flow.hot-air { stroke: #fb7185; }
+
+@keyframes flowDash {
+  to { stroke-dashoffset: -6.4; }
+}
+
+.hotspot-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+/* Valmet DNA İkon Durumları */
+.dna-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  z-index: 6;
+}
+
+.dna-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+
+.dna-node:hover .dna-circle {
+  transform: scale(1.14);
+}
+
+/* 1. Otomatikte & Duruyor -> İçi boş yeşil kontürlü */
+.state-auto-stop {
+  background: #e1e4e8;
+  border: 3px solid #1a9e38;
+  color: #1a9e38;
+}
+
+/* 2. Manuelde & Duruyor -> İçi boş mavi kontürlü */
+.state-man-stop {
+  background: #e1e4e8;
+  border: 3px solid #0066cc;
+  color: #0066cc;
+}
+
+/* 3. Manuelde & Çalışıyor -> İçi dolu mavi */
+.state-man-run {
+  background: #0066cc;
+  border: 2px solid #003d7a;
+  color: #ffffff;
+}
+
+/* 4. Otomatikte & Çalışıyor -> İçi dolu yeşil + >> */
+.state-auto-run {
+  background: #16a34a;
+  border: 2px solid #0d5c2a;
+  color: #ffffff;
+}
+
+/* 5. Arıza / Fault -> Kırmızı çarpı */
+.state-fault {
+  background: #fee2e2;
+  border: 3px solid #dc2626;
+  color: #dc2626;
+}
+
+.run-arrows {
+  font-size: 12px;
+  font-weight: 900;
+  color: #111;
+  background: rgba(255,255,255,0.9);
+  padding: 0 3px;
+  border-radius: 2px;
+}
+
+/* Valmet DNA Dikdörtgen Buton Tipi */
+.dna-btn-box {
+  background: #dcdcdc;
+  border: 2px solid #555;
+  color: #111;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dna-btn-box.active-green {
+  background: #16a34a;
+  color: #fff;
+  border-color: #0d5c2a;
+}
+
+.ind-square {
+  width: 9px;
+  height: 13px;
+  border: 1px solid #333;
+  display: inline-block;
+}
+.ind-red { background: #dc2626; }
+.ind-white { background: #ffffff; }
+.ind-green { background: #16a34a; }
+
+.node-tag {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(13, 17, 23, 0.88);
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  margin-top: 2px;
+  pointer-events: none;
+}
+
+.pulse-target {
+  animation: pulseRing 1.4s infinite;
+}
+
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.9); }
+  70% { box-shadow: 0 0 0 11px rgba(255, 215, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+
+/* Lejant */
+.dna-legend {
+  display: flex;
+  gap: 14px;
+  padding-top: 8px;
+  font-size: 11.5px;
+  color: #adbac7;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-sample {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.pipe-sample {
+  width: 26px;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, #00e676 0 6px, transparent 6px 10px);
+  display: inline-block;
+}
+
+/* Faceplate Modal */
+.faceplate-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 330px;
+  background: #d8dce0;
+  color: #111;
+  border: 2px solid #444;
+  border-radius: 4px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.75);
+  z-index: 100;
+}
+
+.hidden { display: none !important; }
+
+.fp-header {
+  background: #2b579a;
+  color: #fff;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fp-header-warn { background: #b45309; }
+
+.fp-header button {
+  background: transparent;
+  color: #fff;
+  font-size: 16px;
+  padding: 0 4px;
+}
+
+.fp-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fp-status-row {
+  display: flex;
+  justify-content: space-between;
+  background: #eef1f4;
+  padding: 6px 8px;
+  border: 1px solid #b0b7bf;
+  font-size: 12px;
+}
+
+.fp-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.fp-buttons button {
+  background: #e5e7eb;
+  border: 1px solid #6b7280;
+  color: #111;
+  padding: 8px;
+  font-size: 12px;
+}
+
+.fp-buttons button:hover {
+  background: #cbd5e1;
+}
+
+.fp-buttons button.btn-primary-fp {
+  background: #16a34a;
+  color: #fff;
+  border-color: #0d5c2a;
+}
+
+.fp-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.fp-input-group input, .fp-input-group select {
+  padding: 6px;
+  border: 1px solid #6b7280;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.il-intro { font-size: 12px; color: #333; }
+.il-checklist { list-style: none; font-size: 12px; display: flex; flex-direction: column; gap: 6px; }
+.il-checklist li { background: #fff; padding: 6px 8px; border-radius: 3px; border-left: 4px solid #888; }
+.il-checklist li.ok { border-left-color: #16a34a; }
+.il-checklist li.fail { border-left-color: #dc2626; font-weight: 600; }
