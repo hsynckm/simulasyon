@@ -1,4 +1,4 @@
-// TM2 Valmet DNA Operatör Simülatörü Çekirdek Mantığı (V2 — Canlı Hat Akışı & Güncel Lojikler)
+// TM2 Valmet DNA Operatör Simülatörü Çekirdek Mantığı (V3 — Güncel Saha Lojikleri)
 
 let state = {};
 let activeScreenId = "shower_water";
@@ -18,6 +18,8 @@ function initState() {
     headboxPress: 0,
     jwRatio: 0.000,
     stockFlow: 0,
+    hoodTemp: 0,
+    hoodTempSet: false,
     vacuumRunning: false,
     showersReady: false,
     coatingRunning: false,
@@ -76,7 +78,6 @@ function updateTelemetry() {
     prodEl.className = "tele-val status-stopped";
   }
 
-  // Ön şart hapları
   const hpOn = state.nodes.hp_sealing_pump.state.endsWith("run");
   const hpPill = document.getElementById("pill-hp-water");
   hpPill.textContent = hpOn ? "HP Sealing Water: ÇALIŞIYOR" : "HP Sealing Water: KAPALI";
@@ -88,7 +89,9 @@ function updateTelemetry() {
 
   const tailWaterOn = state.nodes.sw_fresh.state.endsWith("run");
   const tailPill = document.getElementById("pill-tail-water");
-  tailPill.textContent = tailWaterOn ? "Tail Cutter Suyu (70.3 Fresh W.): ÇALIŞIYOR" : "Tail Cutter Suyu (70.3 Fresh W.): KAPALI";
+  tailPill.textContent = tailWaterOn
+    ? `Tail Cutter Suyu (${state.nodes.sw_fresh.mode}): ÇALIŞIYOR`
+    : `Tail Cutter Suyu (${state.nodes.sw_fresh.mode}): KAPALI`;
   tailPill.className = tailWaterOn ? "pill pill-green" : "pill pill-warn";
 }
 
@@ -103,7 +106,8 @@ function evaluateProgress() {
     s.cww_2800.state.endsWith("run") &&
     s.scww_350.state.endsWith("run");
 
-  state.hoodReady = s.hood_wet_close.active && s.hood_dry_close.active && s.hood_damper_temp.active;
+  // Hood hazır şartı: Sıcaklık girilmiş (275/300°C) + Wet End kapalı + Dry End kapalı
+  state.hoodReady = state.hoodTempSet && s.hood_wet_close.active && s.hood_dry_close.active;
   state.reelReady = s.reel_drum_m6.speedMode === "Run" && s.reel_spool_m7.state.endsWith("run");
 
   while (state.currentStep <= STEPS.length) {
@@ -170,7 +174,6 @@ function renderMissionPanel() {
     li.textContent = `${st.id}. ${st.title}`;
     if (st.id < state.currentStep) li.classList.add("done");
     if (st.id === state.currentStep) li.classList.add("current");
-    // Tıklanabilir adım geçişi
     li.onclick = () => {
       state.currentStep = st.id;
       activeScreenId = st.screen;
@@ -184,7 +187,6 @@ function renderMissionPanel() {
   });
 }
 
-// Resim Üzeri Canlı Boru Hattı Akış Animasyonu
 function renderPipeAnimations() {
   const svg = document.getElementById("pipe-overlay");
   svg.innerHTML = "";
@@ -218,7 +220,7 @@ function renderHotspots() {
   imgEl.onerror = () => {
     imgEl.style.display = "none";
     fallbackEl.style.display = "flex";
-    fallbackEl.innerHTML = `<h3>${scr.code} — ${scr.name}</h3><p>Görsel bulunamadı: <code>${scr.image}</code><br>Fotoğrafı <b>images/</b> klasörüne koyduğunuzda arka plan ve boru hattı akışları tam oturacaktır.</p>`;
+    fallbackEl.innerHTML = `<h3>${scr.code} — ${scr.name}</h3><p>Görsel bulunamadı: <code>${scr.image}</code></p>`;
   };
 
   const layer = document.getElementById("hotspot-layer");
@@ -269,7 +271,6 @@ function renderHotspots() {
       tag.textContent = node.label;
       el.appendChild(tag);
 
-      // Sürükle-bırak (Koordinat Düzenleme Modu)
       el.onmousedown = (e) => {
         if (!editorMode) return;
         e.preventDefault();
@@ -359,7 +360,27 @@ function openFaceplate(node) {
       }
       state.stockFlow = parseInt(document.getElementById("inp-flow").value, 10);
       node.active = true;
-      logEvent(`SW/HW Stock Flow 'L' modunda ${state.stockFlow} l/min olarak ayarlandı.`);
+      logEvent(`SW/HW Stock Flow 'L' modunda ${state.stockFlow} l/min olarak ayarlandı. Artık Hood'lar kapatılabilir.`);
+      closeFaceplate();
+      evaluateProgress();
+    });
+  } else if (node.id === "hood_damper_temp") {
+    dyn.innerHTML = `
+      <div class="fp-input-group">
+        <label>Hood Başlangıç Kurutma Sıcaklığı (°C):</label>
+        <select id="inp-hood-temp">
+          <option value="275" selected>275 °C (Başlangıç Kurutma)</option>
+          <option value="300">300 °C (Başlangıç Kurutma)</option>
+          <option value="450">450 °C (Tam Üretim Sıcaklığı)</option>
+        </select>
+      </div>`;
+    addFpBtn("Sıcaklığı Uygula", true, () => {
+      const tempVal = parseInt(document.getElementById("inp-hood-temp").value, 10);
+      state.hoodTemp = tempVal;
+      state.hoodTempSet = true;
+      node.active = true;
+      node.label = `Hood Sıcaklığı: ${tempVal}°C`;
+      logEvent(`Hood başlangıç sıcaklığı ${tempVal}°C olarak ayarlandı.`);
       closeFaceplate();
       evaluateProgress();
     });
@@ -383,6 +404,14 @@ function openFaceplate(node) {
         if (node.state === "man-stop") node.state = "auto-stop";
         if (node.state === "man-run") node.state = "auto-run";
         logEvent(`${node.label} Auto moduna alındı.`);
+        closeFaceplate();
+        evaluateProgress();
+      });
+      addFpBtn("Manual Mod", false, () => {
+        node.mode = "Manual";
+        if (node.state === "auto-stop") node.state = "man-stop";
+        if (node.state === "auto-run") node.state = "man-run";
+        logEvent(`${node.label} Manual moduna alındı.`);
         closeFaceplate();
         evaluateProgress();
       });
@@ -442,7 +471,7 @@ function handleDriveCommand(node, cmd) {
 }
 
 function handleGenericStart(node) {
-  // 1. OSİLASYON KİLİTLERİ (70.3 Shower Water)
+  // 1. OSİLASYON KİLİTLERİ
   if (node.id === "sw_3500" && !state.nodes.osc_wire_needle.state.endsWith("run")) {
     return showInterlockError("Elek iğneli osilasyon motoru (Wire Needle İstasyon - 1407) çalışmadan SCWW 3500 kPa devreye girmez!");
   }
@@ -453,9 +482,9 @@ function handleGenericStart(node) {
     return showInterlockError("Keçe iğneli osilasyon motoru (Felt Needle İstasyon - 2410) çalışmadan SCWW 2000 kPa devreye girmez!");
   }
 
-  // 2. TAIL CUTTER SUYU (70.3 Fresh Water) — Stock ON sonrası açılır
+  // 2. TAIL CUTTER SUYU (70.3 Fresh Water) — Auto'da Stock ON ile kendi başlar, Manual'de Stock ON sonrası start izni alır
   if (node.id === "sw_fresh" && !state.stockOn) {
-    return showInterlockError("Fresh Water (Tail Cutter Suyu) hamur almadan (Stock ON) önce açılmamalıdır!");
+    return showInterlockError("Fresh Water (Tail Cutter Suyu) hamur almadan (Stock ON) önce çalıştırılamaz!");
   }
 
   // 3. TURBO VAKUM
@@ -559,21 +588,19 @@ function handleButtonAction(node) {
     state.headboxPress = 140;
     state.jwRatio = 0.420;
     state.nodes.hbx_auto_btn.indicator = "white";
-    logEvent("Headbox FILL aktif: Kısa ve uzun fan pompaları %20 doluma ulaştı. Auto kilidi beyaza döndü.");
+    logEvent("Headbox FILL aktif: Kısa ve uzun fan pompaları %20 doluma ulaştı. Auto kilidi beyaza döndü, hemen Auto'ya basabilirsiniz.");
   } else if (node.id === "hbx_auto_btn") {
+    // Fill'den hemen sonra yapılabilir, makine hızı engel değildir!
     if (!state.headboxFilled) {
       return showInterlockError("Önce 'Headbox FILL' yapıp fan pompalarını %20 doldurmalısınız! (Auto kutucuğu kırmızı)");
-    }
-    if (state.yankeeSpeed < 1100) {
-      return showInterlockError("Makine hızı 1100 m/dk olmadan Headbox Auto basınca geçilemez!");
     }
     node.active = true;
     node.indicator = "green";
     state.headboxAuto = true;
-    state.headboxPress = 514;
+    state.headboxPress = Math.round(state.yankeeSpeed * 0.467);
     state.jwRatio = 0.970;
     state.nodes.qcs_shortcuts_stock.indicator = "white";
-    logEvent("Headbox AUTO aktif: Fan pompaları devirlendi, 514 kPa basınç ve 0.970 Jet/Wire oranı yakalandı!");
+    logEvent(`Headbox AUTO aktif (${state.headboxPress} kPa, Jet/Wire 0.970).`);
   } else if (node.id === "qcs_utm_start") {
     node.active = true;
     state.utmRunning = true;
@@ -589,10 +616,20 @@ function handleButtonAction(node) {
     node.indicator = "green";
     state.stockOn = true;
     state.stockFlow = 1000;
-    logEvent("Shortcuts -> Stock ON aktif! Hamur pompaları devrede (1000 l/min). Şimdi 70.3 Fresh Water (Tail Cutter Suyu) pompasını başlatabilirsiniz.");
+
+    // Tail Cutter suyu (70.3 Fresh Water) Auto modundaysa otomatik çalışır; Manual modundaysa artık start izni açılır
+    if (state.nodes.sw_fresh.mode === "Auto") {
+      state.nodes.sw_fresh.state = "auto-run";
+      logEvent("Shortcuts -> Stock ON aktif! Tail Cutter suyu (70.3 Fresh Water) Auto modunda olduğu için otomatik devreye girdi.");
+    } else {
+      logEvent("Shortcuts -> Stock ON aktif! Tail Cutter suyu Manual modunda — artık 70.3 sayfasından start verebilirsiniz.");
+    }
   } else if (node.id === "hood_wet_close") {
-    if (state.stockFlow < 1200) {
-      return showInterlockError("Önce Stock Flow debisini 1200–1400 l/min aralığına çıkarıp Yankee'de kağıt oluşumunu görün!");
+    if (!state.hoodTempSet) {
+      return showInterlockError("Hood'ları kapatmadan önce başlangıç sıcaklığını (275°C veya 300°C) girmelisiniz!");
+    }
+    if (!state.stockOn || state.stockFlow < 1000) {
+      return showInterlockError("Stock ON deyip ilk hamur akışlarını girdikten sonra Hood'lar kapatılabilir!");
     }
     node.active = true;
     logEvent("Yaş kısım (Wet End) Hood kapatıldı.");
@@ -601,16 +638,10 @@ function handleButtonAction(node) {
       return showInterlockError("Önce Yaş Kısım (Wet End) Hood kapatılmalıdır!");
     }
     node.active = true;
-    logEvent("Kuru kısım (Dry End) Hood kapatıldı.");
-  } else if (node.id === "hood_damper_temp") {
-    if (!state.nodes.hood_wet_close.active || !state.nodes.hood_dry_close.active) {
-      return showInterlockError("Her iki Hood kapanmadan sıcak hava damperi açılamaz!");
-    }
-    node.active = true;
-    logEvent("L/A Sıcak Hava Damperi (%100) açıldı, başlangıç kurutma sıcaklığı 275°C ayarlandı.");
+    logEvent(`Kuru kısım (Dry End) Hood kapatıldı, L/A damperi açılarak ${state.hoodTemp}°C sıcak hava akışı başladı.`);
   } else if (node.id === "qcs_tail_cutter") {
     if (!state.nodes.sw_fresh.state.endsWith("run")) {
-      return showInterlockError("70.3 Shower Water sayfasındaki Fresh Water (Tail Cutter Suyu) pompası çalıştırılmadan Tek Katır devreye alınamaz!");
+      return showInterlockError("70.3 Shower Water sayfasındaki Fresh Water (Tail Cutter Suyu) çalışmadan Tek Katır devreye alınamaz!");
     }
     if (!state.reelReady) {
       return showInterlockError("Reel Drum (Run) ve Spool Starter hazır olmadan Tek Katır devreye alınamaz!");
@@ -631,7 +662,6 @@ function handleButtonAction(node) {
   evaluateProgress();
 }
 
-// İnterlock Matrisi Modalı
 function openInterlockModal() {
   const list = document.getElementById("il-checklist");
   list.innerHTML = "";
@@ -645,9 +675,9 @@ function openInterlockModal() {
     { ok: state.pressLoaded, text: "6. En az 2 raspa basılı ve Suction Press Roll LOAD konumunda" },
     { ok: state.nodes.hp_sealing_pump.state.endsWith("run"), text: "7. HP Sealing Water (10.3 Fresh Water üst hat) açık" },
     { ok: state.screensRunning && state.dilutionRunning, text: "8. Approach Screens ve Dilution Control çalışıyor" },
-    { ok: state.headboxAuto && state.jwRatio >= 0.770, text: "9. Headbox FILL (%20) -> AUTO tamamlandı, Jet/Wire >= 0.770" },
-    { ok: state.utmRunning && state.stockOn && state.nodes.sw_fresh.state.endsWith("run"), text: "10. UTM Start + Stock ON + Tail Cutter Suyu (70.3 Fresh W.) açık" },
-    { ok: state.stockFlow >= 1200 && state.hoodReady && state.reelReady, text: "11. Debi >= 1200 l/min + Hood'lar kapalı (275°C) + Reel Drum & Spool hazır" }
+    { ok: state.headboxAuto, text: "9. Headbox FILL (%20) sonrası doğrudan Headbox AUTO aktif" },
+    { ok: state.hoodTempSet && state.utmRunning && state.stockOn && state.stockFlow >= 1000, text: "10. Hood sıcaklığı (275/300°C) girildi + UTM Start + Stock ON + İlk hamur akışı verildi" },
+    { ok: state.hoodReady && state.nodes.sw_fresh.state.endsWith("run") && state.reelReady, text: "11. Wet/Dry Hood kapalı + Tail Cutter suyu açık + Reel Drum & Spool hazır" }
   ];
 
   rules.forEach(r => {
@@ -660,7 +690,6 @@ function openInterlockModal() {
   document.getElementById("interlock-modal").classList.remove("hidden");
 }
 
-// Event Listener'lar
 document.getElementById("fp-close").onclick = closeFaceplate;
 document.getElementById("btn-close-alert").onclick = hideInterlockError;
 document.getElementById("btn-check-interlock").onclick = openInterlockModal;
@@ -685,6 +714,5 @@ document.getElementById("btn-export-coords").onclick = () => {
   alert("Güncel ikon koordinatları panoya kopyalandı! scenarios.js içindeki INITIAL_NODES listesine yapıştırabilirsiniz.");
 };
 
-// Başlat
 initState();
 evaluateProgress();
