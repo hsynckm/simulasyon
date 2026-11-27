@@ -1,26 +1,24 @@
 // TM2 Valmet DNA Operatör Devreye Alma Senaryo, Boru Akışı & Ekran Yapılandırması
 
 const SCREENS = [
-  { id: "fresh_water", code: "10.3", name: "Fresh Water", image: "images/fresh%20water.jpg" },
-  { id: "shower_water", code: "70.3", name: "Shower Water", image: "images/shower%20water.jpg" },
-  { id: "wire_press", code: "70.9.4", name: "Wire/Press Sec.", image: "images/wire_pres%20section.jpg" },
-  { id: "turbo_vacuum", code: "10.5.1", name: "Turbo Vacuum", image: "images/turbo%20blower.jpg" },
+  { id: "fresh_water", code: "10.3", name: "Fresh Water", image: "images/fresh water.jpg" },
+  { id: "shower_water", code: "70.3", name: "Shower Water", image: "images/shower water.jpg" },
+  { id: "wire_press", code: "70.9.4", name: "Wire/Press Sec.", image: "images/wire_pres section.jpg" },
+  { id: "turbo_vacuum", code: "10.5.1", name: "Turbo Vacuum", image: "images/turbo blower.jpg" },
   { id: "coating", code: "10.9", name: "Coating", image: "images/coating.jpg" },
-  { id: "press_stretchers", code: "70.2", name: "Press & Stretch.", image: "images/press%20and%20strechers.jpg" },
+  { id: "press_stretchers", code: "70.2", name: "Press & Stretch.", image: "images/press and strechers.jpg" },
   { id: "approach_screens", code: "11.5", name: "Approach Screens", image: "images/screenler.jpg" },
   { id: "headbox", code: "70.1", name: "Headbox", image: "images/headbox.jpg" },
-  { id: "we_hood", code: "62.1", name: "WE AirCap / Hood", image: "images/we%20hood.jpg" },
-  { id: "reel_section", code: "70.9.3", name: "Reel Section", image: "images/reel%20section.jpg" },
+  { id: "we_hood", code: "62.1", name: "WE AirCap / Hood", image: "images/we hood.jpg" },
+  { id: "reel_section", code: "70.9.3", name: "Reel Section", image: "images/reel section.jpg" },
   { id: "qcs_overview", code: "90", name: "QCS Overview", image: "images/qsc.jpg" }
 ];
 
-// Resim Üzeri Canlı Boru Hattı Akış Çizgileri (0-100 koordinat yüzdesi)
+// Resim Üzeri Canlı Boru Hattı Akış Çizgileri
 const PIPE_LINES = [
-  // 10.3 Fresh Water — LP Sealing (alt hat) & HP Sealing (üstündeki hat - Pompa ve hat üzerinde)
   { id: "pipe_lp_sealing", screen: "fresh_water", points: "27,82 40,82 92,82", kind: "water", activeWhen: (s) => s.nodes.lp_sealing_pump.state.endsWith("run") },
   { id: "pipe_hp_sealing", screen: "fresh_water", points: "27,75 38,75 76,75 92,75", kind: "hp-water", activeWhen: (s) => s.nodes.hp_sealing_pump.state.endsWith("run") },
 
-  // 70.3 Shower Water — Pompaların önündeki hatlar
   { id: "pipe_sw_3500", screen: "shower_water", points: "17,65 28,65 28,32", kind: "water", activeWhen: (s) => s.nodes.sw_3500.state.endsWith("run") },
   { id: "pipe_cww_200", screen: "shower_water", points: "17,71 79,71 79,53", kind: "water", activeWhen: (s) => s.nodes.cww_200.state.endsWith("run") },
   { id: "pipe_cww_2800", screen: "shower_water", points: "17,77 36,77 36,41", kind: "water", activeWhen: (s) => s.nodes.cww_2800.state.endsWith("run") },
@@ -28,35 +26,30 @@ const PIPE_LINES = [
   { id: "pipe_scww_350", screen: "shower_water", points: "17,89 70,89 70,53", kind: "water", activeWhen: (s) => s.nodes.scww_350.state.endsWith("run") },
   { id: "pipe_scww_2000", screen: "shower_water", points: "17,95 54,95 54,36", kind: "water", activeWhen: (s) => s.nodes.scww_2000.state.endsWith("run") },
 
-  // 10.5.1 Turbo Vacuum
   { id: "pipe_vac_main", screen: "turbo_vacuum", points: "11,31 11,66 34,66 44,66 44,46 66,46 66,60 85,60", kind: "vacuum", activeWhen: (s) => s.vacuumRunning },
 
-  // 10.9 Coating
   { id: "pipe_coat_1", screen: "coating", points: "25,24 68,24 68,72", kind: "chemical", activeWhen: (s) => s.coatingRunning },
   { id: "pipe_coat_2", screen: "coating", points: "25,38 66,38 66,72", kind: "chemical", activeWhen: (s) => s.coatingRunning },
   { id: "pipe_coat_3", screen: "coating", points: "25,52 64,52 64,72", kind: "chemical", activeWhen: (s) => s.coatingRunning },
 
-  // 11.5 Approach Screens
   { id: "pipe_scr_sw", screen: "approach_screens", points: "67,44 85,44", kind: "pulp", activeWhen: (s) => s.screensRunning },
   { id: "pipe_scr_hw", screen: "approach_screens", points: "67,69 85,69", kind: "pulp", activeWhen: (s) => s.screensRunning },
   { id: "pipe_scr_dil", screen: "approach_screens", points: "38,83 85,83", kind: "pulp", activeWhen: (s) => s.screensRunning },
 
-  // 70.1 Headbox
   { id: "pipe_hbx_dil", screen: "headbox", points: "51,27 56,27 56,52", kind: "water", activeWhen: (s) => s.dilutionRunning },
   { id: "pipe_hbx_fan_y", screen: "headbox", points: "49,88 49,52 63,52", kind: "pulp", activeWhen: (s) => s.headboxFilled },
   { id: "pipe_hbx_fan_h", screen: "headbox", points: "55,88 55,56 63,56", kind: "pulp", activeWhen: (s) => s.headboxFilled },
 
-  // 62.1 WE AirCap / Hood
   { id: "pipe_hood_air", screen: "we_hood", points: "47,56 38,56 38,74 22,74", kind: "hot-air", activeWhen: (s) => s.hoodReady }
 ];
 
 // Başlangıç Ekipman Durumları
 const INITIAL_NODES = [
-  // 10.3 Fresh Water — LP Sealing altta çalışıyor, HP Sealing hemen üstündeki hat üzerinde (75% y)
+  // 10.3 Fresh Water
   { id: "lp_sealing_pump", screen: "fresh_water", type: "motor", label: "LP Sealing Water (4.0 Bar)", x: 27, y: 82, state: "auto-run", mode: "Auto" },
   { id: "hp_sealing_pump", screen: "fresh_water", type: "motor", label: "HP Sealing Water (Üst Hat)", x: 76, y: 75, state: "auto-stop", mode: "Auto" },
 
-  // 70.3 Shower Water — Sol pompalar + Fresh Water (Tail Cutter Suyu) + Sağ osilasyon istasyonları
+  // 70.3 Shower Water (sw_fresh Auto'da ise Stock ON anında otomatik çalışır; Manual'e alınırsa Stock ON sonrası elle start ister)
   { id: "sw_3500", screen: "shower_water", type: "motor", label: "SCWW 3500 kPa (Elek İğneli)", x: 17, y: 65, state: "man-stop", mode: "Manual" },
   { id: "cww_200", screen: "shower_water", type: "motor", label: "CWW 200 kPa (Raspa Yağlama)", x: 17, y: 71, state: "man-stop", mode: "Manual" },
   { id: "cww_2800", screen: "shower_water", type: "motor", label: "CWW 2800 kPa (Elek Dökücü)", x: 17, y: 77, state: "man-stop", mode: "Manual" },
@@ -111,9 +104,9 @@ const INITIAL_NODES = [
   { id: "fan_pump_h", screen: "headbox", type: "motor", label: "Fan Pump (Uzun/H)", x: 55, y: 63, state: "auto-stop", mode: "Auto" },
 
   // 62.1 WE AirCap / Hood
+  { id: "hood_damper_temp", screen: "we_hood", type: "button", label: "Hood Sıcaklık Ayarı (275-300°C)", x: 28, y: 45, active: false },
   { id: "hood_wet_close", screen: "we_hood", type: "button", label: "Wet End Hood CLOSE", x: 35, y: 94, active: false },
   { id: "hood_dry_close", screen: "we_hood", type: "button", label: "Dry End Hood CLOSE", x: 21, y: 82, active: false },
-  { id: "hood_damper_temp", screen: "we_hood", type: "button", label: "Sıcak Hava Damperi (275°C)", x: 28, y: 45, active: false },
 
   // 70.9.3 Reel Section
   { id: "reel_drum_m6", screen: "reel_section", type: "motor", label: "Reel Drum (M6)", x: 63, y: 68, state: "auto-stop", mode: "Auto", speedMode: "Stop" },
@@ -165,8 +158,8 @@ const STEPS = [
     id: 5,
     screen: "shower_water",
     title: "Hızı 700 m/dk Yap & Önce Osilasyonları, Sonra Duşları Aç",
-    desc: "Kritik Lojik: Elek iğneli (SCWW 3500), elek dökücü (CWW 2800) ve keçe iğneli (SCWW 2000) motorları sağdaki osilasyon motorları çalışmadan start almaz! Fresh Water'a şimdilik dokunmayın.",
-    targetText: "Hızı 700 m/dk yapın; 70.3 sayfasında önce sağdaki osilasyonları (Wire Needle, Wire Fan, Felt Needle, Coating), sonra CWW 200, SCWW 3500, CWW 2800 (ve normal keçeyse SCWW 2000) pompalarını başlatın.",
+    desc: "Elek iğneli (SCWW 3500), elek dökücü (CWW 2800) ve keçe iğneli (SCWW 2000) motorları sağdaki osilasyon motorları çalışmadan start almaz.",
+    targetText: "Hızı 700 m/dk yapın; 70.3 sayfasında önce sağdaki osilasyonları, sonra CWW 200, SCWW 3500, CWW 2800 pompalarını başlatın.",
     checkDone: (s) => s.yankeeSpeed >= 700 && s.showersReady
   },
   {
@@ -189,48 +182,48 @@ const STEPS = [
     id: 8,
     screen: "approach_screens",
     title: "Hızı 900 m/dk Yap & Approach Screen'leri Çalıştır",
-    desc: "Hızı 900 m/dk'ya çekerken 11.5 Approach Screens sayfasında Fault'u resetleyin, Auto'ya alın ve Group Start verin. (10.3 Fresh Water sayfasında LP hattının üstündeki HP Sealing Water açık olmalıdır!)",
+    desc: "10.3 Fresh Water sayfasında LP hattının üstündeki HP Sealing Water açık olmalıdır. Ardından 11.5 sayfasında Fault'u resetleyip Auto + Group Start verin.",
     targetText: "10.3 sayfasından üst hattaki HP Sealing Water'ı açın; 11.5 sayfasında Dilution Fault'u resetleyin, Auto + Group Start basın.",
     checkDone: (s) => s.screensRunning && s.yankeeSpeed >= 900
   },
   {
     id: 9,
     screen: "headbox",
-    title: "Hızı 1100 m/dk Yap & Dilution Control Start Ver",
-    desc: "Elekler devrede. Hızı 1100 m/dk'ya çıkarın ve 70.1 Headbox sayfasında önce Dilution Start'a basarak sol mod kilitlerini açın.",
-    targetText: "Hızı 1100 m/dk yapın; 70.1 Headbox sayfasında 'Dilution Start' butonuna basın.",
-    checkDone: (s) => s.yankeeSpeed >= 1100 && s.dilutionRunning
+    title: "Dilution Control Start, Headbox FILL ve Headbox AUTO",
+    desc: "Dilution Start sonrası Fill kutucuğu beyaza döner. Fill yapıp fan pompalarını %20 doldurduktan hemen sonra hız şartı olmaksızın Headbox AUTO'ya geçebilirsiniz.",
+    targetText: "70.1 Headbox sayfasında sırasıyla 'Dilution Start' -> 'Headbox FILL' -> 'Headbox AUTO' butonlarına basın.",
+    checkDone: (s) => s.headboxAuto
   },
   {
     id: 10,
-    screen: "headbox",
-    title: "Headbox FILL (%20) ve AUTO (Basınç Yakalama)",
-    desc: "Dilution çalıştı ve Fill kutucuğu beyaza döndü. Önce Fill'e basıp fan pompalarını %20 doldurun, Auto kilidi kalkınca Auto'ya basıp Jet/Wire oranını yakalayın.",
-    targetText: "70.1 Headbox sayfasında önce 'Headbox FILL', ardından 'Headbox AUTO' butonuna basın.",
-    checkDone: (s) => s.headboxAuto && s.jwRatio >= 0.770
+    screen: "we_hood",
+    title: "Hızı 1100 m/dk Yap & Hood Başlangıç Sıcaklığını Gir (275-300°C)",
+    desc: "Hamur alıp hood'ları kapatmadan önce 62.1 WE AirCap sayfasından hood sıcaklığını 275°C veya 300°C olarak ayarlayın ve hızı 1100 m/dk yapın.",
+    targetText: "62.1 WE AirCap sayfasında 'Hood Sıcaklık Ayarı'ndan 275°C veya 300°C girin ve hızı 1100 m/dk yapın.",
+    checkDone: (s) => s.hoodTempSet && s.yankeeSpeed >= 1100
   },
   {
     id: 11,
     screen: "qcs_overview",
-    title: "UTM Start Ver, Stock ON Yap & Tail Cutter Suyunu Aç",
-    desc: "Jet/Wire 0.770 sınırını geçti. UTM Start verin, Shortcuts -> Stock ON yapın ve 70.3 Shower Water sayfasındaki Fresh Water (Tail Cutter Suyu) pompasına start verin!",
-    targetText: "90 QCS'ten 'UTM Start' ve 'Shortcuts -> Stock ON' yapın; 70.3 Shower Water sayfasında 'Fresh Water (Tail Cutter Suyu)' pompasını başlatın.",
+    title: "UTM Start Ver & Shortcuts -> Stock ON ile Hamur Al",
+    desc: "UTM Start sonrası Stock ON dediğinizde Tail Cutter suyu (70.3 Fresh Water) Auto modundaysa otomatik başlar; Manuel modundaysa Stock ON sonrası manuel start verebilirsiniz.",
+    targetText: "90 QCS sayfasında önce 'UTM Start', ardından 'Shortcuts -> Stock ON' butonuna basın.",
     checkDone: (s) => s.stockOn && s.nodes.sw_fresh.state.endsWith("run")
   },
   {
     id: 12,
     screen: "qcs_overview",
-    title: "SW / HW Stock Flow Debisini 1000 -> 1300 l/min Artır",
-    desc: "SW ve HW Stock Flow 'L' modunda iken önce 1000 l/min, kağıt oluşumu başladıkça 1200–1400 l/min aralığına çıkarın.",
-    targetText: "90 QCS sayfasında 'SW/HW Stock Flow (L)' üzerinden debiyi en az 1200 l/min seviyesine getirin.",
-    checkDone: (s) => s.stockFlow >= 1200
+    title: "İlk Hamur Akışlarını Gir (1000 -> 1300 l/min)",
+    desc: "SW ve HW Stock Flow 'L' modunda iken ilk hamur akışlarını (1000–1400 l/min) girin; akış girildikten sonra hood'lar kapatılabilir.",
+    targetText: "90 QCS sayfasında 'SW/HW Stock Flow (L)' üzerinden ilk hamur akışını (en az 1000 l/min) girin.",
+    checkDone: (s) => s.stockFlow >= 1000
   },
   {
     id: 13,
     screen: "we_hood",
-    title: "Yaş ve Kuru Hood'ları Kapat & Sıcak Hava Damperini Aç",
-    desc: "Yankee'de kağıt oluşuyor. Önce Wet End, sonra Dry End Hood'u kapatın ve ortadaki L/A damperinden 250–300°C sıcak hava verin.",
-    targetText: "62.1 WE AirCap sayfasında Wet End ve Dry End Hood'ları kapatıp sıcak hava damperini (275°C) devreye alın.",
+    title: "Yaş (Wet End) ve Kuru (Dry End) Hood'ları Kapat",
+    desc: "Hood sıcaklığı girildi ve ilk hamur akışları verildi. Şimdi önce Wet End, ardından Dry End Hood'u kapatarak sıcak hava akışını devreye alın.",
+    targetText: "62.1 WE AirCap sayfasında önce 'Wet End Hood CLOSE', ardından 'Dry End Hood CLOSE' butonlarına basın.",
     checkDone: (s) => s.hoodReady
   },
   {
@@ -245,7 +238,7 @@ const STEPS = [
     id: 15,
     screen: "qcs_overview",
     title: "Tek Katırı Devreye Al, Kağıdı Bağla ve Üretime Geç",
-    desc: "Tail Cutter suyu (70.3 Fresh Water) açık ve sarıcı hazır! Tek katırı devreye alıp kağıdı bobine bağlayın ve üretimi başlatın.",
+    desc: "Tüm şartlar hazır! Tek katırı devreye alıp kağıdı bobine bağlayın ve üretimi başlatın.",
     targetText: "90 QCS sayfasında önce 'Tek Katır (Tail Cutter)', ardından 'Kağıdı Bağla (Run)' butonuna basın.",
     checkDone: (s) => s.paperThreaded
   }
